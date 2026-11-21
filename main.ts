@@ -29,9 +29,15 @@ const height = bytes.readUInt32BE(20);
 if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
   throw new Error(`entry.png is ${width}x${height}, over the ${MAX_DIMENSION}x${MAX_DIMENSION} limit`);
 }
+if (bytes.subarray(12, 16).toString('ascii') !== 'IHDR') {
+  throw new Error('entry.png has no IHDR chunk where the header should be');
+}
 
 mkdirSync(outDir, { recursive: true });
 copyFileSync(source, join(outDir, 'entry.png'));
 const written = statSync(join(outDir, 'entry.png')).size;
+if (written !== bytes.length) {
+  throw new Error(`copied entry.png is ${written} bytes, expected ${bytes.length}`);
+}
 const sha256 = createHash('sha256').update(bytes).digest('hex');
 console.log(`wrote entry.png (${written} bytes, ${width}x${height}, sha256 ${sha256})`);
