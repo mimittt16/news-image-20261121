@@ -5,6 +5,7 @@
 // limits). Run it locally with:
 //   MAKEFUN_OUTPUT_DIR=out node main.ts
 
+import { createHash } from 'node:crypto';
 import { copyFileSync, mkdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -32,4 +33,5 @@ if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
 mkdirSync(outDir, { recursive: true });
 copyFileSync(source, join(outDir, 'entry.png'));
 const written = statSync(join(outDir, 'entry.png')).size;
-console.log(`wrote entry.png (${written} bytes, ${width}x${height})`);
+const sha256 = createHash('sha256').update(bytes).digest('hex');
+console.log(`wrote entry.png (${written} bytes, ${width}x${height}, sha256 ${sha256})`);
